@@ -31,7 +31,7 @@ exports.add = (req,res,next) => {
     console.log(previousHash);
     var id = new mongoose.Types.ObjectId().toString();
     console.log(id);
-    var hash = crypto.createHash("md5").update(previousHash+id+req.body.batch_id.toString()+req.body.name+req.body.vendorID.toString()+req.body.vendorName+req.body.quantity.toString()+req.body.value.toString()+req.body.man_date.toString()+req.body.exp_date.toString()+req.body.location+req.body.lat_long+req.body.recieved_on.toString()+req.body.dispatched_on.toString()+req.body.item_class+req.body.damage).digest("hex");
+    var hash = crypto.createHash("md5").update(previousHash+id+req.body.batch_id.toString()+req.body.vendorID.toString()+req.body.vendorName+req.body.quantity.toString()+req.body.value.toString()+req.body.man_date.toString()+req.body.exp_date.toString()+req.body.location+req.body.lat_long+req.body.recieved_on.toString()+req.body.dispatched_on.toString()+req.body.item_class+req.body.damage).digest("hex");
     const newInv = new invUser({
             previousHash : previousHash,
             hash : hash,
@@ -87,13 +87,18 @@ exports.trackBatch = (req,res,next) => {
             var prevHash = "New Block";
             var broken = false;
             for(var i = 0;i<result.length;i++){
-                if(prevHash !== result[i].previousHash){
+                if(prevHash != result[i].previousHash){
+                    console.log("Prev Hash");
+                    console.log(prevHash,result[i].previousHash);
                     broken = true;
                 }
-                const hash = crypto.createHash("md5").update(result[i].previousHash+ result[i]._id+result[i].vendorID+result[i].vendorName+result[i].batch_id+result[i].quantity+result[i].value+result[i].man_date+result[i].exp_date+result[i].location+result[i].lat_long+result[i].recieved_on+result[i].dispatched_on+result[i].item_class+result[i].damage).digest("hex");
-                hash = SHA256(result[i].previousHash+ result[i]._id+result[i].vendorID+result[i].vendorName+result[i].batch_id+result[i].quantity+result[i].value+result[i].man_date+result[i].exp_date+result[i].location+result[i].lat_long+result[i].recieved_on+result[i].dispatched_on+result[i].item_class+result[i].damage).toString();
-                if(hash !== result[i].hash){
+                var hash = crypto.createHash("md5").update(result[i].previousHash+result[i].id+result[i].batch_id.toString()+result[i].vendorID.toString()+result[i].vendorName+result[i].quantity.toString()+result[i].value.toString()+result[i].man_date.toString()+result[i].exp_date.toString()+result[i].location+result[i].lat_long+result[i].recieved_on.toString()+result[i].dispatched_on.toString()+result[i].item_class+result[i].damage).digest("hex");
+                // hash = SHA256(result[i].previousHash+ result[i]._id+result[i].vendorID+result[i].vendorName+result[i].batch_id+result[i].quantity+result[i].value+result[i].man_date+result[i].exp_date+result[i].location+result[i].lat_long+result[i].recieved_on+result[i].dispatched_on+result[i].item_class+result[i].damage).toString();
+                if(hash != result[i].hash){
+                    console.log(result[i])
                     broken = true;
+                    console.log("Same Hash");
+                    console.log(hash,result[i].hash);
                 }
 
                 prevHash = hash;
@@ -107,6 +112,7 @@ exports.trackBatch = (req,res,next) => {
     })
     .catch(err => {
         res.status(404).json({
+            Message : "Error!",
             error : err.message
         });
     });
