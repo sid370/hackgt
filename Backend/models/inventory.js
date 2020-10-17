@@ -1,7 +1,11 @@
 const mongoose = require("mongoose");
 const InventoryScema = mongoose.Schema({
-  _id: String,
-  batch_id: { type: Number, unique: true },
+  previousHash : {type : String, required : true},
+  hash : {type : String, required : true},
+  _id: {type : String, required : true, unique : true},
+  vendorID : {type : String, required : true},
+  vendorName : {type : String, required : true},
+  batch_id: { type: Number, required : true},
   quantity: { type: Number },
   value: { type: Number },
   man_date: { type: Date },
