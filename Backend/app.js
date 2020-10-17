@@ -15,9 +15,8 @@ mongoose.connect("mongodb+srv://sid:v2FlOI7OuFwkDmdA@cluster0.l3dlu.mongodb.net/
 app.use(morgan("dev"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(cors())
 app.use(express.static(__dirname))
-
+app.use(cors())
 app.use("/auth", login);
 app.use("/inventory",inventory)
 

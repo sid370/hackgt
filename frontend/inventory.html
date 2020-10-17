@@ -1,0 +1,172 @@
+<html>
+
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+
+<!-- jQuery and JS bundle w/ Popper.js -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+  <title>Inventory</title>
+</head>
+
+<body>
+    <div style="height: 100%;" id="add">
+  <div class="main" style="height: 900px" >
+    <p class="sign" align="center">Add to Blockchain</p>
+    <form class="form1" >
+      <input class="un "  id="batch_id" type="text" align="center" placeholder="Batch Id">
+      <input class="un "  id="quantity" type="number" align="center" placeholder="Quantity">
+      <input class="un " id="value" type="number" align="center" placeholder="Value">
+      <input class="un " id="man_date" type="date" align="center" placeholder="Manufacturing Date">
+      <input class="un " id="exp_date" type="date" align="center" placeholder="Expiry Date">
+      <input class="un " id="location" type="text" align="center" placeholder="City">
+      <input class="un " id="recieved_on" type="date" align="center" placeholder="Recieved on">
+      <input class="un " id="dispatched_on" type="date" align="center" placeholder="Dispatched on">
+      <input class="un " id="item_class" type="text" align="center" placeholder="Item Class">
+      <input class="un " id="damage" type="text" align="center" placeholder="Damages">
+      <a class="submit" align="center" onclick="func();return false;">Add</a>
+    </div>
+</div>
+<br/><br/><br/> <br/><br/><br/><br/><br/> <br/><br/>
+<div style="height: 100vh;" id="detitem">
+     <div class="main" style="height: 200px;">
+     <p class="sign" align="center">Get Details about an item</p>
+     <form class="form1">
+        <input class="un"  id="batch_id2" type="text" align="center" placeholder="Batch Id">
+        <a class="submit" align="center" onclick="func2();return false;">Get</a>
+    </form>
+    <br/><br/><br/>
+    <table class="table" id="tab2"  class="table table-striped table-dark">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Batch ID</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Value</th>
+            <th scope="col">Recieved On</th>
+            <th scope="col">Damage Reported</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" id="bat"></th>
+            <td id="qty"></td>
+            <td id="vals"></td>
+            <td id="recv"></td>
+            <td id="dam"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+</div>
+
+<div style="height: 100vh;" id="detall">
+    <div class="main" style="height: 180px;">
+    <p class="sign" align="center">Get Every block</p>
+    <form class="form1">
+       <a class="submit" align="center" onclick="func3();return false;">Get</a>
+   </form>
+   <br/><br/>   
+   <table class="table" id="tab3" class="table table-striped table-dark table-hover">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Batch ID</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Value</th>
+            <th scope="col">Recieved On</th>
+            <th scope="col">Damage Reported</th>
+          </tr>
+        </thead>
+    </table>
+   </div>
+</div>
+<script>
+    async function func2(){
+        const url="http://localhost:3000/inventory/"+document.getElementById("batch_id2").value.toString()
+        await fetch(url,{
+            headers:{
+                'Authorization': sessionStorage.getItem("token")
+            }
+        })
+        .then(res=>res.json())
+        .then(resp=>{
+            document.getElementById("bat").innerText=resp.batch_id
+            document.getElementById("qty").innerText=resp.quantity
+            document.getElementById("vals").innerText=resp.value
+            document.getElementById("recv").innerText=resp.recieved_on
+            document.getElementById("dam").innerText=resp.damage
+        })
+    }
+
+    async function func3(){
+      if(sessionStorage.getItem("token")===""){
+        alert("Please Login to continue")
+        return;
+      }
+        const url="http://localhost:3000/inventory"
+        await fetch(url,{
+            headers:{
+                'Authorization': sessionStorage.getItem("token")
+            }
+        })
+        .then(res=>res.json())
+        .then(resp=>{
+            count=resp.count
+            if (count!==document.getElementById('tab3').rows.length){
+              for (var i=0;i<count;i++){
+                  var table= document.getElementById('tab3')
+                  len=table.rows.length
+                  var row=table.insertRow(len)
+                  const cell1=row.insertCell(0);
+                  const cell2=row.insertCell(1);
+                  const cell3=row.insertCell(2);
+                  const cell4=row.insertCell(3);
+                  const cell5=row.insertCell(4);
+                  cell1.innerText=resp.inventory[i].batch_id
+                  cell2.innerText=resp.inventory[i].quantity
+                  cell3.innerText=resp.inventory[i].value
+                  cell4.innerText=resp.inventory[i].recieved_on
+                  cell5.innerText=resp.inventory[i].damage
+              }
+            }
+        })
+    }
+</script>
+</body>
+<script>
+    async function func(){
+        const data={
+            batch_id: document.getElementById('batch_id').value,
+            quantity: document.getElementById('quantity').value,
+            value: document.getElementById('value').value,
+            man_date: document.getElementById('man_date').value,
+            exp_date: document.getElementById('exp_date').value,
+            location: document.getElementById('location').value,
+            lat_long: sessionStorage.getItem("latlong"),
+            recieved_on: document.getElementById('recieved_on').value,
+            dispatched_on: document.getElementById('dispatched_on').value,
+            item_class: document.getElementById('item_class').value,
+            damage: document.getElementById('damage').value
+        }
+        await fetch("http://localhost:3000/inventory/add",{
+            method:'POST',
+            headers:{
+              'Authorization':sessionStorage.getItem("token"),
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res=>res.json())
+        .then(resp=>{
+          if (resp.status===200){
+              alert("Please copy the id for next Blockchain page "+resp.data._id)
+          }
+          else{
+            alert("Invalid Block")
+          }
+        })
+    }
+</script>
+</html>

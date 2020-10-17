@@ -1,0 +1,73 @@
+<html>
+
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./style.css">
+  <title>Sign in</title>
+</head>
+
+<body>
+  <div class="main">
+    <p class="sign" align="center">Login</p>
+    <form class="form1">
+      <input class="un " id="email" type="email" align="center" placeholder="Email" required>
+      <input class="pass" id="password" type="password" align="center" placeholder="Password" required>
+      <a class="submit" align="center" onclick="func();return false;">Submit</a>
+    </div>
+     
+</body>
+
+<script>
+    function getlocation(){
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+          } else {
+            alert("Please switch to a browser that supports location to go ahead");
+            window.location.href="home.html"
+          }
+        }
+
+        function showPosition(position) {
+            sessionStorage.setItem("latlong",position.coords.latitude +"," + position.coords.longitude);
+        }
+        
+        navigator.geolocation.watchPosition(()=>{
+        },(error)=>{
+          if (error.code == error.PERMISSION_DENIED){
+            alert("Please enable your location to go ahead");
+            window.location.href="home.html"
+          }
+        })
+
+        getlocation();
+</script>
+
+<script>
+    async function func(){
+        const data={
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value
+        }
+        await fetch("http://localhost:3000/auth/login",{
+            method: 'POST',
+            headers:{
+                    'Content-Type': 'application/json',
+                    'Origin': 'http://localhost:3000/'
+                },
+            body: JSON.stringify(data)
+        })
+        .then(res=>res.json())
+        .then(resp=>{
+            if (resp.status===200){
+                sessionStorage.setItem("token",resp.token)   
+                window.location.href="inventory.html"
+            }
+            else{
+                alert(resp.message)
+            }
+        })
+    }
+</script>
+
+</html>
