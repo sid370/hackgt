@@ -12,11 +12,14 @@ mongoose.connect("mongodb+srv://sid:v2FlOI7OuFwkDmdA@cluster0.l3dlu.mongodb.net/
     useUnifiedTopology: true
 });
 
+app.set('views', './views');
+app.set('view engine', 'ejs');
 app.use(morgan("dev"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(express.static(__dirname))
 app.use(cors())
+app.use(express.static(__dirname))
+
 app.use("/auth", login);
 app.use("/inventory",inventory)
 
