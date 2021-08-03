@@ -14,11 +14,13 @@
 
 <body>
     <div style="height: 100%;" id="add">
-  <div class="main" style="height: 900px" >
+  <div class="main" style="height: 1050px" >
     <p class="sign" align="center">Add to Blockchain</p>
     <form class="form1" >
       <input class="un "  id="batch_id" type="text" align="center" placeholder="Batch Id">
       <input class="un "  id="quantity" type="number" align="center" placeholder="Quantity">
+      <input class="un "  id="vendorID" type="number" align="center" placeholder="Vendor ID">
+      <input class="un "  id="vendorName" type="text" align="center" placeholder="Vendor Name">
       <input class="un " id="value" type="number" align="center" placeholder="Value">
       <input class="un " id="man_date" type="date" align="center" placeholder="Manufacturing Date">
       <input class="un " id="exp_date" type="date" align="center" placeholder="Expiry Date">
@@ -30,6 +32,7 @@
       <a class="submit" align="center" onclick="func();return false;">Add</a>
     </div>
 </div>
+<br/><br/><br/> <br/><br/><br/><br/><br/> <br/><br/>
 <br/><br/><br/> <br/><br/><br/><br/><br/> <br/><br/>
 <div style="height: 100vh;" id="detitem">
      <div class="main" style="height: 200px;">
@@ -49,7 +52,7 @@
             <th scope="col">Damage Reported</th>
           </tr>
         </thead>
-        <tbody>
+        <!-- <tbody>
           <tr>
             <th scope="row" id="bat"></th>
             <td id="qty"></td>
@@ -57,7 +60,7 @@
             <td id="recv"></td>
             <td id="dam"></td>
           </tr>
-        </tbody>
+        </tbody> -->
       </table>
     </div>
 </div>
@@ -84,7 +87,7 @@
 </div>
 <script>
     async function func2(){
-        const url="http://localhost:3000/inventory/"+document.getElementById("batch_id2").value.toString()
+        const url="http://localhost:4000/inventory/"+document.getElementById("batch_id2").value.toString()
         await fetch(url,{
             headers:{
                 'Authorization': sessionStorage.getItem("token")
@@ -92,11 +95,36 @@
         })
         .then(res=>res.json())
         .then(resp=>{
-            document.getElementById("bat").innerText=resp.batch_id
-            document.getElementById("qty").innerText=resp.quantity
-            document.getElementById("vals").innerText=resp.value
-            document.getElementById("recv").innerText=resp.recieved_on
-            document.getElementById("dam").innerText=resp.damage
+          console.log(resp);
+          var count = resp.result.length;
+          
+          for (var i=0;i<count;i++){
+                  var table= document.getElementById('tab2')
+                  len=table.rows.length
+                  var row=table.insertRow(len)
+                  const cell1=row.insertCell(0);
+                  const cell2=row.insertCell(1);
+                  const cell3=row.insertCell(2);
+                  const cell4=row.insertCell(3);
+                  const cell5=row.insertCell(4);
+                  cell1.innerText=resp.result[i].batch_id
+                  cell2.innerText=resp.result[i].quantity
+                  cell3.innerText=resp.result[i].value
+                  cell4.innerText=resp.result[i].recieved_on
+                  cell5.innerText=resp.result[i].damage
+              }
+              if(resp.broken === true){
+                alert("Data has been tampered. Contact Special Service");
+              } else {
+                alert("Chain Valid");
+              }
+              // alert("The Chain status is : " ,resp.broken);
+            // document.getElementById("bat").innerText=resp.batch_id
+            // document.getElementById("qty").innerText=resp.quantity
+            // document.getElementById("vals").innerText=resp.value
+            // document.getElementById("recv").innerText=resp.recieved_on
+            // document.getElementById("dam").innerText=resp.damage
+
         })
     }
 
@@ -105,7 +133,7 @@
         alert("Please Login to continue")
         return;
       }
-        const url="http://localhost:3000/inventory"
+        const url="http://localhost:4000/inventory"
         await fetch(url,{
             headers:{
                 'Authorization': sessionStorage.getItem("token")
@@ -114,7 +142,7 @@
         .then(res=>res.json())
         .then(resp=>{
             count=resp.count
-            if (count!==document.getElementById('tab3').rows.length){
+            
               for (var i=0;i<count;i++){
                   var table= document.getElementById('tab3')
                   len=table.rows.length
@@ -130,7 +158,7 @@
                   cell4.innerText=resp.inventory[i].recieved_on
                   cell5.innerText=resp.inventory[i].damage
               }
-            }
+            
         })
     }
 </script>
@@ -140,6 +168,8 @@
         const data={
             batch_id: document.getElementById('batch_id').value,
             quantity: document.getElementById('quantity').value,
+            vendorID : document.getElementById('vendorID').value,
+            vendorName: document.getElementById('vendorName').value,
             value: document.getElementById('value').value,
             man_date: document.getElementById('man_date').value,
             exp_date: document.getElementById('exp_date').value,
@@ -150,7 +180,7 @@
             item_class: document.getElementById('item_class').value,
             damage: document.getElementById('damage').value
         }
-        await fetch("http://localhost:3000/inventory/add",{
+        await fetch("http://localhost:4000/inventory/add",{
             method:'POST',
             headers:{
               'Authorization':sessionStorage.getItem("token"),
@@ -162,6 +192,7 @@
         .then(resp=>{
           if (resp.status===200){
               alert("Please copy the id for next Blockchain page "+resp.data._id)
+              window.location.href = "http://localhost:3000"
           }
           else{
             alert("Invalid Block")
